@@ -1,0 +1,40 @@
+process Left graphinfo {
+location idle (360,-80);
+locationName idle(-10,-30);
+location choice (-56,64);
+locationName choice(-10,-30);
+location before_a (112,40);
+locationName before_a(-10,-30);
+location before_b (120,128);
+locationName before_b(-10,-30);
+location after_a (240,-8);
+locationName after_a(-10,-30);
+location after_b (384,56);
+locationName after_b(-10,-30);
+trans idle choice 1 (-168,-48);
+sync idle choice 1 (-16,-80);
+trans choice before_a 1 (-76,12);
+sync before_a after_a 1 (-16,-32);
+sync before_b after_b 1 (-28,36);
+sync after_b idle 1 (-68,-28);
+sync after_a idle 1 (92,20);
+}
+process Right graphinfo {
+location idle (512,-64);
+locationName idle(-10,-30);
+location choice (190,80);
+locationName choice(-10,-30);
+location before_a (264,192);
+locationName before_a(-10,-30);
+location before_b (40,230);
+locationName before_b(-10,-30);
+location after_a (340,80);
+locationName after_a(-10,-30);
+location after_b (340,230);
+locationName after_b(-10,-30);
+sync idle choice 1 (1,-32);
+sync before_a after_a 1 (-97,4);
+sync before_b after_b 1 (-60,-15);
+sync after_a idle 1 (-42,0);
+sync after_b idle 1 (30,-27);
+}

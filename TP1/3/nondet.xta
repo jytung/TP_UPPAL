@@ -1,0 +1,32 @@
+/* Probleme du choix distant: Choix interne  */ 
+int choix ;
+chan s, a, b ;
+
+process Agent() {
+int param=1;
+state
+    before_a,
+    before_b,
+    choice,
+    idle;
+urgent
+    before_a,
+    before_b,
+    choice,
+    idle;
+init idle;
+trans
+    before_b -> idle { guard param==2; sync b!; assign param--;  },
+    choice -> before_a { guard choix==1 and param ==2; sync s?;  },
+    choice -> before_b { guard choix==2 and param==2; sync s?;  },
+    choice -> before_b { guard choix==2 and param==1; sync s!;  },
+    idle -> choice { guard param==1; sync s!; assign choix:=2;  },
+    before_a -> idle { guard param==1; sync a!; assign param++;  },
+    before_a -> idle { guard param==2; sync a?; assign param--;  },
+    idle -> choice { guard param==2; sync s?;  },
+    idle -> choice { guard param==1; sync s!; assign choix:=1;  },
+    choice -> before_a { guard choix==1 and param==1; sync s!;  },
+    before_b -> idle { guard param==1; sync b?; assign param++;  };
+}
+agent := Agent();
+system agent;
