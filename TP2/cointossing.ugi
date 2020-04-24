@@ -1,0 +1,69 @@
+process fifo graphinfo {
+location service (40,80);
+locationName service(24,8);
+location erreur (190,80);
+locationName erreur(-10,-30);
+trans service service 1 (-48,-112);
+trans service service 1 (8,-112);
+guard service service 1 (-80,-32);
+sync service service 1 (-60,-15);
+assign service service 1 (-448,-40);
+trans service service 2 (-38,130);
+trans service service 2 (22,130);
+guard service service 2 (-96,128);
+sync service service 2 (-68,145);
+assign service service 2 (-184,160);
+guard service erreur 1 (-43,-48);
+sync service erreur 1 (-19,-24);
+}
+process player graphinfo {
+sync perdu repos 1 (-60,-15);
+trans gagner repos 1 (104,-84);
+sync gagner repos 1 (-60,-15);
+guard recoit perdu 1 (12,20);
+assign recoit perdu 1 (20,44);
+guard recoit gagner 1 (-12,-52);
+assign recoit gagner 1 (12,-28);
+sync envoie recoit 1 (-64,-19);
+assign envoie recoit 1 (-64,-4);
+sync idle envoie 1 (-56,-24);
+assign idle envoie 1 (-56,0);
+location perdu (296,264);
+locationName perdu(-10,-30);
+location gagner (296,-120);
+locationName gagner(-10,-30);
+location recoit (592,80);
+locationName recoit(-24,-32);
+location envoie (400,80);
+locationName envoie(-24,-32);
+location repos (40,80);
+locationName repos(-10,-30);
+location idle (192,80);
+locationName idle(-8,-40);
+select repos idle 1 (-28,-48);
+sync repos idle 1 (-28,-24);
+assign repos idle 1 (-28,0);
+}
+process site graphinfo {
+location idle (40,80);
+locationName idle(-10,-30);
+location wait (190,80);
+locationName wait(-10,-30);
+location envoi (192,232);
+locationName envoi(-10,-30);
+location apres_envoi (40,230);
+locationName apres_envoi(-10,-30);
+location recoit (340,80);
+locationName recoit(-10,-30);
+location apres_recoit (176,-120);
+locationName apres_recoit(-10,-30);
+sync idle wait 1 (-27,-24);
+guard wait envoi 1 (-61,-31);
+sync wait envoi 1 (-61,-16);
+guard wait recoit 1 (-49,-24);
+sync wait recoit 1 (-41,8);
+sync envoi apres_envoi 1 (-61,-16);
+assign envoi apres_envoi 1 (-61,-1);
+sync recoit apres_recoit 1 (14,-51);
+assign recoit apres_recoit 1 (14,-36);
+}

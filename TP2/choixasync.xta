@@ -7,52 +7,52 @@ int  LRVG,  LRVP;
 chan RLGET, RLPUT;
 int  RLVG,  RLVP;
 
+chan ack;
 
-
-
-process site(chan &in, chan &out, int &vin, int &vout){
-int mesg; 
-state  idle,  apres_envoi, apres_recoit;
-urgent idle,  apres_envoi, apres_recoit;
+process site(chan &in, chan &out, int &vin, int &vout) {
+int mesg;
+const int ack=3;
+state
+    waiting_ack,
+    idle,
+    apres_envoi,
+    apres_recoit;
+urgent
+    idle,
+    apres_envoi,
+    apres_recoit;
 init idle;
-trans 
-idle  -> apres_envoi{sync out!; assign vout := 5;},
-idle  -> apres_recoit{sync in?; assign mesg := vin;},
-apres_envoi -> idle{},
-apres_recoit -> idle{};
+trans
+    waiting_ack -> apres_envoi { guard vin==5; sync out!; assign vout:=ack;  },
+    waiting_ack -> idle { guard mesg==ack;  },
+    apres_envoi -> waiting_ack { sync in?; assign mesg:=vin;  },
+    idle -> apres_envoi { sync out!; assign vout := 5;  },
+    idle -> apres_recoit { sync in?; assign mesg := vin;  },
+    apres_recoit -> idle { sync out!; assign vout:=ack;  };
 }
 
-process fifo(const int cap, chan &get, chan &put,  int &vget,  int &vput){
-        int cpt := 0;
+process fifo(const int cap, chan &get, chan &put,  int &vget,  int &vput, bool flag) {
+int cpt := 0;
         int buf[cap];
         int ixP := 0;
         int ixG := 0;
-
-        state service, erreur;
-        urgent service, erreur;
-        init service;
-        trans
-
-        service -> service{
-                guard cpt > 0;
-                sync get!;
-                assign vget:= buf[ixG], 
-                cpt:= cpt - 1, ixG:= (ixG == (cap - 1))?0:(ixG + 1);
-        },
-        service -> service{
-                guard cpt < cap;
-                sync put?;
-                assign buf[ixP]:= vput, cpt:= cpt + 1, 
-                ixP:= (ixP == (cap - 1))?0:(ixP + 1);
-        }; 
-      
+ 
+state
+    service,
+    erreur;
+urgent
+    service,
+    erreur;
+init service;
+trans
+    service -> erreur { guard cpt>=cap && flag; sync put?;  },
+    service -> service { guard cpt > 0; sync get!; assign vget:= buf[ixG], 
+                cpt:= cpt - 1, ixG:= (ixG == (cap - 1))?0:(ixG + 1);  },
+    service -> service { guard cpt < cap; sync put?; assign buf[ixP]:= vput, cpt:= cpt + 1, 
+                ixP:= (ixP == (cap - 1))?0:(ixP + 1);  };
 }
-
-
-
-
-FifoLR  := fifo(4,LRGET,LRPUT,LRVG,LRVP);
-FifoRL  := fifo(4,RLGET,RLPUT,RLVG,RLVP);
+FifoLR  := fifo(4,LRGET,LRPUT,LRVG,LRVP,true);
+FifoRL  := fifo(4,RLGET,RLPUT,RLVG,RLVP,false);
 
 gauche := site(RLGET,LRPUT,RLVG,LRVP);
 droit :=  site(LRGET,RLPUT,LRVG,RLVP);
